@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Gamifikasi Kepuasan Pelanggan: Satu Bidikan</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#fff4e6;--mut:#e0b9a0;--amb:#ffb347;--red:#ff5a4d;--deep:#2a1238}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#150920;color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:100vw;height:100%;font-size:13px;overflow:hidden;background:linear-gradient(180deg,#3b1650,#c8466b 55%,#ff9a5a);user-select:none;-webkit-user-select:none;touch-action:none;box-shadow:0 0 60px rgba(0,0,0,.6)}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.screen.on{display:flex}
+#welcome,#debrief{padding:2em 1.7em 1.6em;overflow-y:auto;touch-action:pan-y;background:linear-gradient(180deg,#ff9a5a 0,#c8466b 16%,#3b1650 40%,#1d0b2b)}
+.hero{position:relative;height:9.5em;flex:0 0 auto;margin-bottom:.8em;overflow:hidden;border-radius:1.2em;background:linear-gradient(180deg,#ffd18a,#ff7a5a)}
+.hero .sun{position:absolute;left:50%;top:1.2em;margin-left:-2.3em;width:4.6em;height:4.6em;border-radius:50%;background:radial-gradient(#fff3c4,#ffb347);box-shadow:0 0 3em #ffb347}
+.hero .br{position:absolute;left:-5%;right:-5%;bottom:1.4em;height:.55em;background:#3a1d12;border-radius:1em;transform:rotate(-2deg)}
+.hero .hill{position:absolute;left:-10%;right:-10%;bottom:-3em;height:5em;background:#2a1238;border-radius:50% 50% 0 0}
+.b{position:absolute;font-size:2.2em;bottom:1.5em;animation:hop 1.8s ease-in-out infinite}
+.b:nth-of-type(1){left:18%}.b:nth-of-type(2){left:46%;animation-delay:-.6s}.b:nth-of-type(3){left:72%;animation-delay:-1.2s}
+@keyframes hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-.4em) rotate(-6deg)}}
+h1{margin:.1em 0 .3em;font-size:2em;line-height:1.08;font-weight:800;letter-spacing:-.02em;text-align:center}
+.t{margin:0 0 .8em;font-size:.9em;line-height:1.5;color:#ffe6d2}
+.mission{background:rgba(255,179,71,.13);border:.08em solid rgba(255,179,71,.45);border-radius:.9em;padding:.75em .9em;font-size:.86em;line-height:1.5;color:#fff0dc;margin-bottom:1em}
+.mission li{margin:.25em 0}.mission ul{margin:.4em 0 0;padding-left:1.2em}
+.field label{display:block;font-size:.82em;font-weight:600;color:var(--mut);margin-bottom:.35em}
+.field input{width:100%;padding:.85em 1em;border-radius:.8em;border:.09em solid rgba(255,255,255,.25);background:rgba(21,9,32,.8);color:#fff;font:inherit;font-size:1em;outline:none}
+.field input:focus{border-color:var(--amb);box-shadow:0 0 0 .2em rgba(255,179,71,.28)}
+.btn{margin-top:.9em;width:100%;padding:.95em 1em;border:0;border-radius:.9em;font:inherit;font-weight:800;font-size:1.02em;color:#2a1200;background:linear-gradient(180deg,#ffd27a,#ffa92e);box-shadow:0 .35em 0 #b86a0c,0 .8em 1.2em rgba(0,0,0,.35);cursor:pointer;transition:transform .12s,box-shadow .12s}
+.btn:active{transform:translateY(.25em);box-shadow:0 .1em 0 #b86a0c}
+.btn:disabled{opacity:.45;box-shadow:0 .35em 0 #6b4a1c}
+.btn.alt{background:linear-gradient(180deg,#ffffff,#ffe0c4);box-shadow:0 .35em 0 #b58a6a,0 .8em 1.2em rgba(0,0,0,.3)}
+/* GAME */
+.topbar{position:relative;z-index:3;display:flex;justify-content:space-between;align-items:center;padding:.9em 1.2em .5em;background:linear-gradient(180deg,rgba(21,9,32,.7),transparent)}
+.brand b{display:block;font-size:1em;font-weight:800}.brand small{color:var(--mut);font-size:.8em}
+.pill{background:rgba(21,9,32,.65);border:.08em solid rgba(255,255,255,.25);border-radius:2em;padding:.4em .9em;font-weight:800;font-size:.95em}
+#cv{position:absolute;inset:0;width:100%;height:100%;z-index:1;touch-action:none}
+#hud{position:absolute;z-index:3;left:0;right:0;bottom:0;padding:0 1.4em 1.4em;display:flex;flex-direction:column;align-items:center;gap:.7em;pointer-events:none}
+#lock{width:100%;font-size:.82em;font-weight:700;text-align:center;color:#fff;text-shadow:0 .1em .4em #000}
+#fire{pointer-events:auto;width:6.2em;height:6.2em;border-radius:50%;border:.3em solid #fff;background:radial-gradient(#ff8a7a,#e0301f);color:#fff;font:inherit;font-weight:800;font-size:1em;box-shadow:0 .4em 0 #8f170c,0 .8em 1.6em rgba(0,0,0,.5);transition:transform .1s}
+#fire:active{transform:translateY(.3em)}
+#bn{position:absolute;z-index:4;left:1em;right:1em;top:38%;text-align:center;font-weight:800;font-size:2.3em;line-height:1.05;opacity:0;transform:scale(.7);transition:.35s;pointer-events:none;text-shadow:0 .1em 1em #000}
+#bn.show{opacity:1;transform:scale(1)}#bn small{display:block;margin-top:.5em;font-size:.38em;font-weight:600;color:#ffe6d2}
+#flash{position:absolute;inset:0;z-index:5;background:#fff;opacity:0;pointer-events:none}
+#intro{position:absolute;z-index:6;inset:0;background:rgba(21,9,32,.9);display:flex;flex-direction:column;justify-content:center;padding:2em 1.7em;gap:.7em}
+#intro h2{margin:0 0 .3em;font-size:1.7em;text-align:center}
+.step{display:flex;gap:.8em;align-items:center;background:rgba(255,255,255,.08);border-radius:.9em;padding:.75em .9em;font-size:.92em;line-height:1.45}
+.step i{font-style:normal;font-size:1.6em}
+/* DEBRIEF */
+.trophy{font-size:4.2em;text-align:center;margin-top:.1em}
+#debrief h2{margin:.1em 0 .3em;text-align:center;font-size:1.7em;line-height:1.1}
+.lead{margin:0 0 1em;text-align:center;color:var(--mut);font-size:.92em;line-height:1.5}
+.stats{display:flex;gap:.6em;margin-bottom:1em}
+.stat{flex:1;background:rgba(255,255,255,.09);border-radius:.9em;padding:.8em .4em;text-align:center}
+.stat b{display:block;font-size:1.5em;font-weight:800;color:var(--amb)}.stat small{font-size:.72em;color:var(--mut);line-height:1.3;display:block}
+.box{background:rgba(255,255,255,.08);border:.08em solid rgba(255,255,255,.14);border-radius:1em;padding:.9em 1em;margin-bottom:.9em;font-size:.88em;line-height:1.55}
+.box h3{margin:0 0 .5em;font-size:1em;color:var(--amb)}
+.cu{display:flex;gap:.7em;margin:.55em 0;align-items:flex-start}.cu i{font-style:normal;font-size:1.7em}.cu p{margin:0}.cu b{display:block}
+</style>
+</head>
+<body>
+<div id="stage">
+<!-- BRIEFING -->
+<section id="welcome" class="screen on">
+  <div class="hero"><div class="sun"></div><div class="br"></div><span class="b">🐦</span><span class="b">🦜</span><span class="b">🐥</span><div class="hill"></div></div>
+  <h1>Menembak Satu Peluru Kena Tiga Burung</h1>
+  <p class="t">Bayangkan Bapak/Ibu adalah seorang pemburu. Di depan Bapak/Ibu ada <b>tiga burung</b>. Tugas Bapak/Ibu sederhana: Tembak tiga burung tersebut dengan hanya menggunakan satu peluru.</p>
+  <div class="mission"><strong>Petunjuk Gamifikasi:</strong>
+    <ul><li><b>Geser jari</b> di layar untuk menggerakkan teropong bidik.</li><li>Arahkan ke burung incaran, lalu tekan tombol <b>TEMBAK</b>.</li><li>Akan tetapi, Bapak/Ibu hanya punya <b>satu peluru</b>.</li></ul></div>
+  <div class="field"><label for="pn">Nama Bapak/Ibu</label><input id="pn" type="text" placeholder="Ketik nama Bapak/Ibu di sini..." autocomplete="off" maxlength="40"></div>
+  <button id="go" class="btn" disabled>Mulai Gamifikasi</button>
+</section>
+<!-- GAME -->
+<section id="game" class="screen">
+  <div class="topbar"><div class="brand"><b>Sang Pemburu</b><small id="who"></small></div><div class="pill">🎯 1 peluru &nbsp;•&nbsp; <span id="tl">25</span> dtk</div></div>
+  <canvas id="cv"></canvas>
+  <div id="bn"></div><div id="flash"></div>
+  <div id="hud"><div id="lock">Geser jari untuk membidik</div><button id="fire">TEMBAK</button></div>
+  <div id="intro"><h2>Siap membidik? 🎯</h2>
+    <div class="step"><i>👆</i><span><b>Geser jari</b> di layar. Teropong akan mengikuti sentuhan jari Bapak/Ibu.</span></div>
+    <div class="step"><i>🐦</i><span>Tiga burung bertengger di dahan. Pilih satu <b>incaran</b> dan tahan bidikan di atasnya sampai terkunci.</span></div>
+    <div class="step"><i>💥</i><span>Tekan <b>TEMBAK</b>. Ingat, Bapak/Ibu hanya punya satu peluru, jadi pikirkan strateginya baik-baik.</span></div>
+    <button id="ready" class="btn">Mulai Membidik</button></div>
+</section>
+<!-- DEBRIEFING -->
+<section id="debrief" class="screen">
+  <div class="trophy">🪶</div>
+  <h2>Burung yang didapat: 0<br><small style="font-size:.55em;font-weight:600;color:#e0b9a0">Bapak/Ibu <span id="dn"></span></small></h2>
+  <p class="lead" id="rl"></p>
+  <div class="stats"><div class="stat"><b>0/3</b><small>Burung didapat</small></div><div class="stat"><b id="sa">0s</b><small>Waktu membidik</small></div><div class="stat"><b id="sl">0%</b><small>Fokus pada satu burung</small></div></div>
+  <div class="box"><h3>Kesimpulan Gamifikasi</h3>
+    <p style="margin:0 0 .6em">Satu tembakan, tiga burung terbang. Kejadian tersebut sama halnya dengan pelayanan: Perlakuan terhadap satu pelanggan tidak berhenti pada satu pelanggan.</p>
+    <p style="margin:0;color:#ffd27a">Satu pelanggan yang kecewa bisa menceritakan pengalamannya ke banyak orang dan kepercayaan yang hilang sulit dipulihkan. Karena itu, satu pelanggan pun sangat berarti. Kepuasannya harus tetap diperhatikan.</p></div>
+  <div class="box" id="rc"></div>
+  <button id="again" class="btn alt">Ulang Gamifikasi</button>
+</section>
+</div>
+<script>
+const $=i=>document.getElementById(i),stage=$('stage');
+function fit(){const a=document.activeElement;if(a&&a.tagName==='INPUT')return;const vw=innerWidth,vh=innerHeight,w=Math.min(vw,vh*9/16);stage.style.width=w+'px';stage.style.height=vh+'px';stage.style.fontSize=(w/28)+'px';size()}
+addEventListener('resize',fit);document.addEventListener('focusout',()=>setTimeout(fit,250));
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id))}
+const DUR=25;
+const CU=[
+ {n:'Pelanggan Setia',e:'🦜',m:'😊',x:.22,y:.40,r:.1,rec:'Pelanggan yang puas adalah aset terbesar. Ia kembali, merekomendasikan, dan memaafkan sesekali kekeliruan, selama dihargai.'},
+ {n:'Pelanggan Baru',e:'🐦',m:'🙂',x:.52,y:.33,r:.1,rec:'Pelanggan baru masih menilai. Kesan pertama menentukan apakah ia akan menjadi pelanggan tetap atau pergi tanpa kabar.'},
+ {n:'Pelanggan Kecewa',e:'🐥',m:'😟',x:.80,y:.45,r:.085,rec:'Yang paling mudah diabaikan adalah yang paling perlu didengar. Satu keluhan yang tidak ditangani bisa menjadi alasan semua orang pergi.'}];
+const cv=$('cv'),cx=cv.getContext('2d');let W=0,H=0,dpr=1;
+function size(){dpr=Math.min(devicePixelRatio||1,2);W=stage.clientWidth;H=stage.clientHeight;cv.width=W*dpr;cv.height=H*dpr;cx.setTransform(dpr,0,0,dpr,0,0)}
+let name='',run=false,fired=false,t,last,sc,tgt,lockT,lockMax,lockBird,aim,birds,fx,shake,focus;
+$('pn').addEventListener('input',e=>{$('go').disabled=!e.target.value.trim()});
+$('go').onclick=()=>{name=$('pn').value.trim();$('who').textContent='Pemburu: '+name;show('game');fit();reset();$('intro').style.display='flex';draw()};
+$('ready').onclick=()=>{$('intro').style.display='none';run=true;last=performance.now();requestAnimationFrame(loop)};
+$('again').onclick=()=>{show('game');fit();reset();$('intro').style.display='flex';draw()};
+function reset(){t=0;fired=false;run=false;sc={x:W/2,y:H*.62};tgt={x:W/2,y:H*.62};lockT=0;lockMax=0;lockBird=-1;aim=0;shake=0;focus=[0,0,0];fx=[];
+ birds=CU.map((c,i)=>({...c,px:c.x*W,py:c.y*H,vx:0,vy:0,ph:i*2,fly:false,rot:0}));
+ $('tl').textContent=DUR;$('lock').textContent='Geser jari untuk membidik';$('bn').classList.remove('show');$('fire').disabled=false;$('hud').style.display='flex'}
+function move(e){if(!run||fired)return;e.preventDefault();const r=cv.getBoundingClientRect(),p=e.touches?e.touches[0]:e;tgt.x=p.clientX-r.left;tgt.y=p.clientY-r.top-W*.16}
+['pointerdown','pointermove'].forEach(v=>cv.addEventListener(v,move,{passive:false}));
+cv.addEventListener('touchmove',move,{passive:false});cv.addEventListener('touchstart',move,{passive:false});
+$('fire').onclick=()=>shoot();
+function hit(){const sx=sc.x+Math.sin(t*1.7)*W*.012,sy=sc.y+Math.cos(t*2.3)*W*.012;let k=-1;birds.forEach((b,i)=>{if(Math.hypot(sx-b.px,sy-(b.py-b.ph*0))<b.r*W*.75)k=i});return k}
+function shoot(){if(!run||fired)return;fired=true;const k=hit();fx.push();$('flash').style.transition='none';$('flash').style.opacity=.9;setTimeout(()=>{$('flash').style.transition='opacity .5s';$('flash').style.opacity=0},40);
+ shake=1;$('fire').disabled=true;$('lock').textContent='';$('hud').style.display='none';
+ const aimed=k>=0?k:(lockBird>=0?lockBird:-1);window._aimed=aimed;
+ birds.forEach((b,i)=>{b.fly=true;b.vx=(i-1)*W*.5+(Math.random()-.5)*W*.2;b.vy=-H*(.35+Math.random()*.2);for(let j=0;j<10;j++)fx.push({x:b.px,y:b.py,vx:(Math.random()-.5)*W*.6,vy:(Math.random()-.8)*W*.5,l:1.4})});
+ setTimeout(()=>{const b=$('bn');b.innerHTML='Semua burung kabur! 💨<small>Peluru habis. Hasil buruan: 0.</small>';b.classList.add('show')},700);
+ setTimeout(end,3600)}
+function loop(n){if(!run)return;const dt=Math.min((n-last)/1000,.05);last=n;step(dt);draw();requestAnimationFrame(loop)}
+function step(dt){t+=dt;
+ if(!fired){aim+=dt;sc.x+=(tgt.x-sc.x)*Math.min(1,dt*9);sc.y+=(tgt.y-sc.y)*Math.min(1,dt*9);
+  const k=hit();if(k>=0){if(k===lockBird)lockT+=dt;else{lockBird=k;lockT=0}focus[k]+=dt;lockMax=Math.max(lockMax,lockT);$('lock').textContent=lockT>1?'🔒 Terkunci: '+birds[k].n+'. Tembak sekarang?':'Membidik '+birds[k].n+'...'}else{lockT=0;lockBird=-1;$('lock').textContent='Arahkan teropong ke salah satu burung'}
+  const left=Math.max(0,DUR-t);$('tl').textContent=Math.ceil(left);if(left<=0)shoot()}
+ else{birds.forEach(b=>{b.px+=b.vx*dt;b.py+=b.vy*dt;b.vy-=H*.1*dt;b.rot=Math.sin(t*25)*.35});shake=Math.max(0,shake-dt*2.2)}
+ fx.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=W*.5*dt;p.l-=dt});fx=fx.filter(p=>p.l>0)}
+function draw(){cx.setTransform(dpr,0,0,dpr,0,0);cx.clearRect(0,0,W,H);
+ const sx=shake?(Math.random()-.5)*shake*W*.04:0,sy=shake?(Math.random()-.5)*shake*W*.04:0;cx.save();cx.translate(sx,sy);
+ let g=cx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#3b1650');g.addColorStop(.5,'#c8466b');g.addColorStop(.78,'#ff9a5a');g.addColorStop(1,'#ffd18a');cx.fillStyle=g;cx.fillRect(-20,-20,W+40,H+40);
+ const sg=cx.createRadialGradient(W*.5,H*.7,0,W*.5,H*.7,W*.5);sg.addColorStop(0,'rgba(255,243,196,.95)');sg.addColorStop(.3,'rgba(255,179,71,.6)');sg.addColorStop(1,'rgba(255,179,71,0)');cx.fillStyle=sg;cx.fillRect(0,H*.3,W,H*.7);
+ cx.fillStyle='#4a1d4f';hill(H*.74,H*.06,1.3);cx.fillStyle='#2a1238';hill(H*.82,H*.05,2.1);cx.fillStyle='#150920';hill(H*.92,H*.04,.8);
+ // branch
+ cx.strokeStyle='#3a1d12';cx.lineCap='round';cx.lineWidth=W*.028;cx.beginPath();cx.moveTo(-10,H*.5);cx.bezierCurveTo(W*.3,H*.46,W*.6,H*.52,W+10,H*.49);cx.stroke();
+ cx.lineWidth=W*.012;cx.beginPath();cx.moveTo(W*.1,H*.48);cx.lineTo(W*.02,H*.42);cx.moveTo(W*.7,H*.51);cx.lineTo(W*.9,H*.55);cx.stroke();
+ cx.font=W*.06+'px serif';cx.textAlign='center';[[.08,.43],[.94,.52],[.04,.55]].forEach(l=>cx.fillText('🍃',l[0]*W,l[1]*H));
+ // birds
+ birds.forEach((b,i)=>{const bob=b.fly?0:Math.sin(t*3+i*2)*W*.008,fs=b.r*W*2.4;cx.save();cx.translate(b.px,b.py+bob);
+  if(b.fly)cx.rotate(b.rot);cx.font=fs+'px serif';cx.textBaseline='middle';cx.fillText(b.e,0,0);cx.restore();
+  if(!b.fly){const lx=b.px,ly=b.py-b.r*W*1.7;cx.font='700 '+W*.03+'px "Plus Jakarta Sans",sans-serif';const w=cx.measureText(b.n).width+W*.1;
+   cx.fillStyle='rgba(21,9,32,.72)';rr(lx-w/2,ly-W*.035,w,W*.07,W*.035);cx.fill();cx.fillStyle='#fff';cx.fillText(b.m+' '+b.n,lx,ly+W*.002)}});
+ // feathers
+ fx.forEach(p=>{cx.globalAlpha=Math.max(0,p.l);cx.font=W*.04+'px serif';cx.fillText('🪶',p.x,p.y)});cx.globalAlpha=1;
+ cx.restore();
+ // scope
+ if(!fired){const x=sc.x+Math.sin(t*1.7)*W*.012,y=sc.y+Math.cos(t*2.3)*W*.012,R=W*.14,k=hit(),lk=k>=0?Math.min(1,lockT):0;
+  cx.fillStyle='rgba(10,3,16,.55)';cx.beginPath();cx.rect(0,0,W,H);cx.arc(x,y,R,0,6.283,true);cx.fill('evenodd');
+  cx.strokeStyle=k>=0?'#ff5a4d':'#fff';cx.lineWidth=W*.008;cx.beginPath();cx.arc(x,y,R,0,6.283);cx.stroke();
+  cx.lineWidth=W*.004;cx.beginPath();cx.moveTo(x-R,y);cx.lineTo(x-R*.25,y);cx.moveTo(x+R*.25,y);cx.lineTo(x+R,y);cx.moveTo(x,y-R);cx.lineTo(x,y-R*.25);cx.moveTo(x,y+R*.25);cx.lineTo(x,y+R);cx.stroke();
+  cx.fillStyle='#ff5a4d';cx.beginPath();cx.arc(x,y,W*.008,0,6.283);cx.fill();
+  if(lk>0){cx.strokeStyle='#ffb347';cx.lineWidth=W*.014;cx.beginPath();cx.arc(x,y,R+W*.022,-1.57,-1.57+6.283*lk);cx.stroke()}}}
+function hill(y,a,f){cx.beginPath();cx.moveTo(-10,H+10);for(let x=-10;x<=W+10;x+=10)cx.lineTo(x,y+Math.sin(x/W*6.283*f+f)*a);cx.lineTo(W+10,H+10);cx.fill()}
+function rr(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath()}
+function end(){run=false;
+ const tot=focus[0]+focus[1]+focus[2],top=Math.max(...focus),pc=tot>0?Math.round(top/Math.max(aim,.1)*100):0,a=window._aimed;
+ $('dn').textContent=name;$('sa').textContent=aim.toFixed(1)+'s';$('sl').textContent=pc+'%';
+ $('rl').textContent=a>=0?'Anda membidik '+CU[a].n+', tetapi ketiga burung pergi sekaligus. Satu tembakan sudah cukup untuk kehilangan semuanya.':'Tembakan Anda meleset, namun suaranya tetap membuat ketiga burung terbang. Gangguan pada satu hal bisa berdampak ke semuanya.';
+ let h='<h3>Tiga Pelanggan yang Pergi</h3>';CU.forEach(c=>{h+='<div class="cu"><i>'+c.e+'</i><p><b>'+c.n+'</b>'+c.rec+'</p></div>'});$('rc').innerHTML=h;
+ show('debrief');$('debrief').scrollTop=0;
+ try{window.parent.postMessage("scoreBarFound","*");}catch(e){}
+ try{window.top.postMessage("scoreBarFound","*");}catch(e){}
+}
+fit();
+</script>
+</body>
+</html>
