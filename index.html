@@ -8,7 +8,7 @@
 <style>
 :root{--ink:#fff4e6;--mut:#e0b9a0;--amb:#ffb347;--red:#ff5a4d;--deep:#2a1238}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;overflow:hidden;background:#150920;color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+html,body{margin:0;height:100%;height:100dvh;overflow:hidden;background:#150920;color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
 body{display:flex;align-items:center;justify-content:center}
 #stage{position:relative;width:100vw;height:100%;font-size:13px;overflow:hidden;background:linear-gradient(180deg,#3b1650,#c8466b 55%,#ff9a5a);user-select:none;-webkit-user-select:none;touch-action:none;box-shadow:0 0 60px rgba(0,0,0,.6)}
 .screen{position:absolute;inset:0;display:none;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -37,9 +37,9 @@ h1{margin:.1em 0 .3em;font-size:2em;line-height:1.08;font-weight:800;letter-spac
 .brand b{display:block;font-size:1em;font-weight:800}.brand small{color:var(--mut);font-size:.8em}
 .pill{background:rgba(21,9,32,.65);border:.08em solid rgba(255,255,255,.25);border-radius:2em;padding:.4em .9em;font-weight:800;font-size:.95em}
 #cv{position:absolute;inset:0;width:100%;height:100%;z-index:1;touch-action:none}
-#hud{position:absolute;z-index:3;left:0;right:0;bottom:0;padding:0 1.4em 1.4em;display:flex;flex-direction:column;align-items:center;gap:.7em;pointer-events:none}
+#hud{position:absolute;z-index:3;left:0;right:0;bottom:0;padding:0 1.4em calc(2.6em + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;gap:.7em;pointer-events:none}
 #lock{width:100%;font-size:.82em;font-weight:700;text-align:center;color:#fff;text-shadow:0 .1em .4em #000}
-#fire{pointer-events:auto;width:6.2em;height:6.2em;border-radius:50%;border:.3em solid #fff;background:radial-gradient(#ff8a7a,#e0301f);color:#fff;font:inherit;font-weight:800;font-size:1em;box-shadow:0 .4em 0 #8f170c,0 .8em 1.6em rgba(0,0,0,.5);transition:transform .1s}
+#fire{pointer-events:auto;width:5.6em;height:5.6em;border-radius:50%;border:.3em solid #fff;background:radial-gradient(#ff8a7a,#e0301f);color:#fff;font:inherit;font-weight:800;font-size:.9em;padding:0;box-shadow:0 .4em 0 #8f170c,0 .8em 1.6em rgba(0,0,0,.5);transition:transform .1s}
 #fire:active{transform:translateY(.3em)}
 #bn{position:absolute;z-index:4;left:1em;right:1em;top:38%;text-align:center;font-weight:800;font-size:2.3em;line-height:1.05;opacity:0;transform:scale(.7);transition:.35s;pointer-events:none;text-shadow:0 .1em 1em #000}
 #bn.show{opacity:1;transform:scale(1)}#bn small{display:block;margin-top:.5em;font-size:.38em;font-weight:600;color:#ffe6d2}
@@ -99,8 +99,9 @@ h1{margin:.1em 0 .3em;font-size:2em;line-height:1.08;font-weight:800;letter-spac
 </div>
 <script>
 const $=i=>document.getElementById(i),stage=$('stage');
-function fit(){const a=document.activeElement;if(a&&a.tagName==='INPUT')return;const vw=innerWidth,vh=innerHeight,w=Math.min(vw,vh*9/16);stage.style.width=w+'px';stage.style.height=vh+'px';stage.style.fontSize=(w/28)+'px';size()}
-addEventListener('resize',fit);document.addEventListener('focusout',()=>setTimeout(fit,250));
+const MAX_H=600; // tinggi maksimal area permainan (px)
+function fit(){const a=document.activeElement;if(a&&a.tagName==='INPUT')return;const vv=window.visualViewport,vw=vv?vv.width:innerWidth,vh=Math.min(vv?vv.height:innerHeight,innerHeight),h=Math.min(vh,MAX_H),w=Math.min(vw,h*9/16);stage.style.width=w+'px';stage.style.height=h+'px';stage.style.fontSize=Math.min(w/28,h/50)+'px';size()}
+addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));if(window.visualViewport)visualViewport.addEventListener('resize',fit);document.addEventListener('focusout',()=>setTimeout(fit,250));
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id))}
 const DUR=25;
 const CU=[
@@ -170,6 +171,7 @@ function end(){run=false;
  try{window.parent.postMessage("scoreBarFound","*");}catch(e){}
  try{window.top.postMessage("scoreBarFound","*");}catch(e){}
 }
+fit();
 fit();
 </script>
 </body>
